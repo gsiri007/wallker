@@ -9,7 +9,7 @@ root = tkinter.Tk()
 root.title('wallker')
 root.config(bg='black')
 
-# image buttons
+# image details
 image_paths   = []
 image_buttons = []
 
@@ -26,19 +26,12 @@ def set_wallpaper(path: str) -> None:
 
     if response:
         subprocess.run(
-            [
-                f'hyprctl hyprpaper preload {path} && hyprctl hyprpaper wallpaper ", {path}"',
-            ],
+            [f'hyprctl hyprpaper preload {path} && hyprctl hyprpaper wallpaper ", {path}"',],
             shell=True,
             stdout=subprocess.DEVNULL
-            
         )
     else:
         pass
-
-
-
-
 
 def set_image_btn_command():
     for btn in image_buttons:
