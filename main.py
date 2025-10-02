@@ -1,9 +1,10 @@
 from os import path
 import tkinter
 from tkinter import messagebox
-import subprocess
 from customtkinter import LEFT, CTkFrame, CTkImage, CTkButton, CTkLabel, CTkScrollableFrame, filedialog
 from PIL import Image
+import subprocess
+import threading
 
 root = tkinter.Tk()
 root.title('wallker')
@@ -16,7 +17,11 @@ image_buttons = []
 # functions
 def set_directory() -> None:
     directory = filedialog.askdirectory()
-    get_images(directory)
+    threading.Thread(
+        target=get_images_async, 
+        args=(directory,), 
+        daemon=True
+    ).start()
 
 def set_wallpaper(path: str) -> None:
     response = messagebox.askyesno(
@@ -26,7 +31,7 @@ def set_wallpaper(path: str) -> None:
 
     if response:
         subprocess.run(
-            [f'hyprctl hyprpaper preload {path} && hyprctl hyprpaper wallpaper ", {path}"',],
+            f'hyprctl hyprpaper preload {path} && hyprctl hyprpaper wallpaper ", {path}"',
             shell=True,
             stdout=subprocess.DEVNULL
         )
@@ -39,7 +44,7 @@ def set_image_btn_command():
         btn.configure(command=lambda i=index: set_wallpaper(image_paths[i]))
         btn.pack(pady=10)
 
-def get_images(directory: str):
+def get_images_async(directory: str):
     result = subprocess.run(
         f'ls {directory}', 
         capture_output=True, 
@@ -50,15 +55,19 @@ def get_images(directory: str):
     images = result.split()
 
     for image in images:
-        image_path = f'{directory}/{image}'
-        image_paths.append(image_path)
-        img = Image.open(image_path)
-        ctk_img = CTkImage(light_image=img, dark_image=img, size=(250,250))
-        image_buttons.append(CTkButton(
-            body_frame, 
-            text="",
-            image=ctk_img, 
-        ))
+        try:
+            image_path = f'{directory}/{image}'
+            image_paths.append(image_path)
+            img = Image.open(image_path)
+            img.thumbnail((250, 250), Image.Resampling.BICUBIC)
+            ctk_img = CTkImage(light_image=img, dark_image=img, size=(250,250))
+            image_buttons.append(CTkButton(
+                body_frame, 
+                text="",
+                image=ctk_img, 
+            ))
+        except Exception as e:
+            print(f'ERROR: {e}')
 
     set_image_btn_command()
 
@@ -77,6 +86,5 @@ select_directory_btn = CTkButton(
     command=set_directory
 )
 select_directory_btn.pack(side=LEFT)
-
 
 root.mainloop()
