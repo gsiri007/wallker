@@ -1,22 +1,27 @@
 from os import path
 import tkinter
 from tkinter import messagebox
-from customtkinter import LEFT, CTkFrame, CTkImage, CTkButton, CTkLabel, CTkScrollableFrame, filedialog
+from customtkinter import LEFT, CTkFrame, CTkImage, CTkButton, CTkScrollableFrame, filedialog
 from PIL import Image
 import subprocess
 import threading
+
 
 #############################################
 #             Initialization                #
 #############################################
 
+
 root = tkinter.Tk()
 root.title('wallker')
 root.config(bg='black')
 
+
 #############################################
 #             Functions                     #
 #############################################
+
+
 def set_directory() -> None:
     directory = filedialog.askdirectory()
     threading.Thread(
@@ -53,6 +58,7 @@ def get_images_async(directory: str):
 
     for image in images:
         try:
+            #TODO:check if file is an image format, skip if not a valid format
             image_path = f'{directory}/{image}'
             img = Image.open(image_path)
 
@@ -68,19 +74,23 @@ def get_images_async(directory: str):
 #               GUI                         #
 #############################################
 
+# frames
 header_frame = CTkFrame(root)
-body_frame = CTkScrollableFrame(root)
+body_frame = CTkScrollableFrame(root, fg_color='black')
 
-header_frame.pack()
+header_frame.pack(pady=20)
 body_frame.pack(fill='both', expand=True)
 
-
+# widgets
 select_directory_btn = CTkButton(
     header_frame,
     text='Select',
-    command=set_directory
+    command=set_directory,
+    bg_color='grey',
+    fg_color='grey',
+    corner_radius=0
 )
-select_directory_btn.pack(side=LEFT)
+select_directory_btn.pack()
 
 def set_image_btn(image_path: str, ctk_img: CTkImage):
     img_btn = CTkButton(
