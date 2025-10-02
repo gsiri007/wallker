@@ -6,11 +6,17 @@ from PIL import Image
 import subprocess
 import threading
 
+#############################################
+#             Initialization                #
+#############################################
+
 root = tkinter.Tk()
 root.title('wallker')
 root.config(bg='black')
 
-# functions
+#############################################
+#             Functions                     #
+#############################################
 def set_directory() -> None:
     directory = filedialog.askdirectory()
     threading.Thread(
@@ -34,12 +40,6 @@ def set_wallpaper(path: str) -> None:
     else:
         pass
 
-def set_image_btn(image_path: str, ctk_img: CTkImage):
-    CTkButton(
-        body_frame, 
-        text="",
-        image=ctk_img, 
-    ).pack(pady=10)
 
 def get_images_async(directory: str):
     result = subprocess.run(
@@ -64,19 +64,31 @@ def get_images_async(directory: str):
             print(f'ERROR: {e}')
 
 
-# frames
+#############################################
+#               GUI                         #
+#############################################
+
 header_frame = CTkFrame(root)
 body_frame = CTkScrollableFrame(root)
 
 header_frame.pack()
 body_frame.pack(fill='both', expand=True)
 
-# widgets
+
 select_directory_btn = CTkButton(
     header_frame,
     text='Select',
     command=set_directory
 )
 select_directory_btn.pack(side=LEFT)
+
+def set_image_btn(image_path: str, ctk_img: CTkImage):
+    img_btn = CTkButton(
+        body_frame, 
+        text="",
+        image=ctk_img, 
+        command=lambda p=image_path:set_wallpaper(p)
+    )
+    img_btn.pack(pady=10)
 
 root.mainloop()
