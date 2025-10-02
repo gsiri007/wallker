@@ -10,10 +10,6 @@ root = tkinter.Tk()
 root.title('wallker')
 root.config(bg='black')
 
-# image details
-image_paths   = []
-image_buttons = []
-
 # functions
 def set_directory() -> None:
     directory = filedialog.askdirectory()
@@ -38,11 +34,12 @@ def set_wallpaper(path: str) -> None:
     else:
         pass
 
-def set_image_btn_command():
-    for btn in image_buttons:
-        index = image_buttons.index(btn)
-        btn.configure(command=lambda i=index: set_wallpaper(image_paths[i]))
-        btn.pack(pady=10)
+def set_image_btn(image_path: str, ctk_img: CTkImage):
+    CTkButton(
+        body_frame, 
+        text="",
+        image=ctk_img, 
+    ).pack(pady=10)
 
 def get_images_async(directory: str):
     result = subprocess.run(
@@ -57,19 +54,14 @@ def get_images_async(directory: str):
     for image in images:
         try:
             image_path = f'{directory}/{image}'
-            image_paths.append(image_path)
             img = Image.open(image_path)
+
             img.thumbnail((250, 250), Image.Resampling.BICUBIC)
             ctk_img = CTkImage(light_image=img, dark_image=img, size=(250,250))
-            image_buttons.append(CTkButton(
-                body_frame, 
-                text="",
-                image=ctk_img, 
-            ))
+
+            root.after(0, set_image_btn, image_path, ctk_img)
         except Exception as e:
             print(f'ERROR: {e}')
-
-    set_image_btn_command()
 
 
 # frames
