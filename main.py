@@ -1,7 +1,7 @@
 from os import path
 import tkinter
 from tkinter import messagebox
-from customtkinter import LEFT, CTkFrame, CTkImage, CTkButton, CTkScrollableFrame, filedialog
+from customtkinter import CTkFrame, CTkImage, CTkButton, CTkScrollableFrame, filedialog
 from PIL import Image
 import subprocess
 import threading
@@ -58,29 +58,30 @@ def get_images_async(directory: str):
 
     row = 0
     column = 0
-    for index, image in enumerate(images):
-        try:
-            #TODO:check if file is an image format, skip if not a valid format
-            image_path = f'{directory}/{image}'
-            img = Image.open(image_path)
+    for image in images:
+        extensions = ['png', 'jpg', 'jpeg', 'webp']
+        if any(extension in image for extension in extensions):
+            try:
+                image_path = f'{directory}/{image}'
+                img = Image.open(image_path)
 
-            img.thumbnail((250, 250), Image.Resampling.BICUBIC)
-            ctk_img = CTkImage(light_image=img, dark_image=img, size=(250,250))
+                img.thumbnail((250, 250), Image.Resampling.BICUBIC)
+                ctk_img = CTkImage(light_image=img, dark_image=img, size=(250,250))
 
-            root.after(0, set_image_btn, image_path, ctk_img, (row, column))
-        except Exception as e:
-            print(f'ERROR: {e}')
+                root.after(0, set_image_btn, image_path, ctk_img, (row, column))
+            except Exception as e:
+                print(f'ERROR: {e}')
 
-        column += 1
-        if column == 6:
-            column = 0
-            row += 1
-
+            column += 1
+            if column == 6:
+                column = 0
+                row += 1
 
 
 #############################################
 #               GUI                         #
 #############################################
+
 
 # frames
 header_frame = CTkFrame(root)
