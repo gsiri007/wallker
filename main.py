@@ -29,16 +29,15 @@ def set_directory() -> None:
         daemon=True
     ).start()
 
-def set_wallpaper(path: str, mode: tkinter.StringVar) -> None:
+def set_wallpaper(path: str, mode: str) -> None:
     response = messagebox.askyesno(
         message= 'Are you sure you want to set this image as the wallpaper?',
         icon='question'
     )
     
-    command = f'hyprctl hyprpaper preload {path} && hyprctl hyprpaper wallpaper ", {mode.get()}:{path}"'
 
-    if not mode.get():
-        command = f'hyprctl hyprpaper preload {path} && hyprctl hyprpaper wallpaper ", {path}"'
+    command = f'swww img --resize {mode} {path}'
+    print(command)
     
     if response:
         subprocess.run(
@@ -105,39 +104,47 @@ open_directory_btn = CTkButton(
 )
 open_directory_btn.grid(row=0, column=1)
 
-mode = tkinter.StringVar(value="contain") 
-contain_rbtn = CTkRadioButton(
+mode = tkinter.StringVar(value="no") 
+default_rbtn = CTkRadioButton(
     header_frame, 
     variable=mode, 
-    value="contain", 
-    text="contain", 
+    value="no", 
+    text="Default", 
     text_color="white"
 )
-tile_rbtn= CTkRadioButton(
+crop_rbtn = CTkRadioButton(
     header_frame, 
     variable=mode,
-    value="tile",
-    text="tile",
+    value="crop",
+    text="Crop",
     text_color="white"
 )
-conver_rbtn = CTkRadioButton(
+fit_rbtn = CTkRadioButton(
     header_frame, 
     variable=mode, 
-    value="",
-    text="cover",
+    value="fit",
+    text="Fit",
+    text_color="white"
+)
+stretch_rbtn = CTkRadioButton(
+    header_frame, 
+    variable=mode, 
+    value="stretch",
+    text="Stretch",
     text_color="white"
 )
 
-contain_rbtn.grid(row=1, column=0, pady=15)
-tile_rbtn.grid(row=1, column=1, pady=15)
-conver_rbtn.grid(row=1, column=2, pady=15)
+default_rbtn.grid(row=1, column=0, pady=15)
+crop_rbtn.grid(row=1, column=1, pady=15)
+fit_rbtn.grid(row=1, column=2, pady=15)
+stretch_rbtn.grid(row=1, column=3, pady=15)
 
 def set_image_btn(image_path: str, ctk_img: CTkImage, cell: tuple):
     img_btn = CTkButton(
         body_frame, 
         text="",
         image=ctk_img, 
-        command=lambda p=image_path:set_wallpaper(p, mode)
+        command=lambda p=image_path:set_wallpaper(p, mode.get())
     )
     row, column = cell
     img_btn.grid(row=row, column=column, padx=25, pady=10)
