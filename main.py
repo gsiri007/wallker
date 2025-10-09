@@ -37,7 +37,6 @@ def set_wallpaper(path: str, mode: str) -> None:
     
 
     command = f'swww img --resize {mode} {path}'
-    print(command)
     
     if response:
         subprocess.run(
